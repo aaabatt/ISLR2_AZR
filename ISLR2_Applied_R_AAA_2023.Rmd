@@ -1,0 +1,191 @@
+---
+title: "ISLR2_Applied_R_AAA_2023"
+author: "AAABatt"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    toc: yes
+    fig_caption: yes
+    number_sections: yes
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(MASS)
+library(ISLR2)
+library(forcats)
+library(tidyverse)
+ISLR2::Wage
+head(Wage) 
+tail(Wage)
+msing<-is.na(Wage)
+table(msing) %>% print()
+View(Wage)
+plot(x=Wage$age,Wage$wage,col=Wage$age, xlab="age",ylab="wage")
+df<-matrix(c(1L:3000L),nrow=3000,ncol=11, byrow = T)
+df %>% summary() %>%  print()
+Wage %>% summary() %>%  print()
+class(Wage)
+dim(Wage)
+df<-c(Wage[,,drop=F])
+str(df)
+df$age<-as.factor(c(df$age))
+str(df)
+
+dF<-as.data.frame(df)
+glimpse(dF)
+str(dF)
+#compare density plots of wages (continous var) 
+#across education strata(categorical var)
+#categorical vars are factor data type in R
+#Education is a categorical var
+#Along with Age Groups technically depending on the var of interest.
+#I.e. Age measured over time.
+# Cros-sectional vs longitudinal, retrospective ,prospective,etc
+#
+dF$education<-as.factor(dF$education)
+dF$race<-as.factor(dF$race)
+str(dF)
+bxplotEduWage<- plot(x=factor(dF$education), main="Boxplots of Wages by Education Level Distributions; by AAA",y=dF$wage,xlab="Education Level", ylab="Wage")
+bxplotEduWage %>% print()
+dF$education %>% levels()
+vdf<-dF[,c("age"),drop=F]==Wage[,c("age"),drop=F]
+
+
+
+dnsityplT.dF<-dF %>% ggplot(data=dF,mapping=aes(x=c(wage),title=c("Density plots of Wage Distributions by Education Levels"),sub=("; with AAA")))+geom_density(alpha=0.5,size=c(0.9),fill="grey")+facet_grid(education~.,scales = "free")
+dnsityplT.dF%>% print()
+
+
+
+hsTdF<-dF %>% ggplot(data=dF,mapping=aes(
+  x=c(wage),title=("Histograms plots of Wage Distributions by Education Levels and Race ISLR2")))+geom_histogram(bins=20,aes(fill=race))+facet_grid(education~.,scales = "free")
+hsTdF %>% print()
+
+bxrdF<-dF %>% ggplot(data=dF,ylab="",mapping=aes(
+  x=c(wage),title=("Box plots of Wage Distributions by Education Levels and Race ISLR2")))+geom_boxplot(aes( fill=race))+facet_grid(education~.,scales = "free")
+bxrdF %>% print()
+
+dF$race<-as.factor(dF$race)
+
+dnsityplTDemo.dF<-dF %>% ggplot(data=dF,mapping=aes(
+  x=c(wage),color=education,title=("Density plots of Wage Distributions, by Racial Categories; ISLR2")))+geom_density(alpha=0.5, aes(fill=education))+facet_grid(race~.,scales = "free")
+dnsityplTDemo.dF %>% print()
+
+mdianwgeR<-summarise(dF,.by = c(race),mdianwge=median(wage)) %>% data.frame() %>% print()
+tapply(c(as.numeric(dF$wage)),c(factor(dF$race)),summary)
+mnsss<-tapply(c(dF$wage),factor(dF$race),mean)
+
+ggplot(data=dF,aes(x=c(wage), y= factor(race)))+geom_boxplot()
+
+ggplot(data=dF,aes(x= wage, y= race))+geom_boxplot(aes(color=race,fill=race))+ facet_grid(race~.,scales = "free")
+
+ggplot(data=dF,aes(x= wage, y= education,title=("Wage distributions by Education Level and Race;"),
+                   sub=("Dataset=ISLR2[Wage]Graph made in R by AAA")))+geom_boxplot(aes(color=race,fill=race))+facet_grid(race~.,scales = "free")
+
+hstyplTDemo.dF<-dF %>% ggplot(data=dF,mapping=aes(
+  x=c(wage)))+geom_histogram()+facet_grid(race~.,scales = "free")
+hstyplTDemo.dF %>% print()
+
+
+summarise(dF,.by = c(race),mdianwge=median(wage)) %>% data.frame() %>% print()
+
+
+smrydF<-matrix()
+smrydF<-summary(dF) %>% print()
+
+summary(dF$race)
+tapply(dF$wage,factor(dF$race),median)
+tapply(dF$wage,factor(dF$age), median) %>% 
+  plot(xlab="Age",ylab = "Wage",
+       main="Scatterplot of Age vs Wage, from ISLR2 R package Wage Dataset",
+       sub="by AAA")
+
+
+
+#helpful plot aesthetics funcs
+#xlab="Age",ylab = "Wage",
+#       main="Scatterplot of Age vs Wage, from ISLR2 R package Wage Dataset",
+#       sub="by AAA")
+View(smrydF)
+dim(smrydF)
+glimpse(smrydF)
+#?data.frame(),etc
+#?aes()
+#?plot()
+#?par()
+summary(dF$wage)
+blkdF<-filter(dF,race==("2. Black"))
+blkdF
+summary(blkdF)
+
+
+#blkdF
+dnsityplT.blkdF<-blkdF %>% ggplot(data=blkdF,mapping=aes(x=c(wage),title=c("A.A. Density plots of Wage Distributions by Education Levels"),sub=("; with AAA")))+geom_density(alpha=0.5,size=c(0.9),fill="grey")+facet_grid(education~.,scales = "free")
+dnsityplT.blkdF%>% print()
+
+
+dnsityplT.blkdF1<-blkdF %>% na.ommit() %>%  ggplot(data=blkdF,mapping=aes(
+  x=c(logwage),title=c("Density plots of Wage Distributions by Education Levels and Age group ISLR2"),sub=("; with AAA")))+geom_density(alpha=0.5,aes(fill=age, color=age,size=numeric(logwage)),size=0.3)+facet_grid(education~.,scales = "free")
+dnsityplT.blkdF1%>% print()
+
+
+hsTdFblk<-blkdF %>% ggplot(data=blkdF,mapping=aes(
+  x=c(wage),title=("A.A. Histograms plots of Wage Distributions by Education Levels and Race ISLR2")))+geom_histogram(bins=20,aes(fill=education))+facet_grid(education~.,scales = "free")
+hsTdFblk %>% print()
+
+bxrdFblk<-blkdF %>% ggplot(data=blkdF,ylab="",mapping=aes(
+  x=c(logwage),title=("A.A. Box plots of Wage Distributions by Education Levels and Race ISLR2")))+geom_boxplot(aes( fill=education))+facet_grid(education~.,scales = "free")
+bxrdFblk %>% print()
+
+dF$race<-as.factor(dF$race)
+dnsityplTDemo.blkdF<-blkdF %>% ggplot(data=blkdF,mapping=aes(x=c(wage),color=education,title=("A.A. Density plots of Wage Distributions, by Education Level; ISLR2")))+geom_density(alpha=0.5, aes(fill=education))+facet_grid(education~.,scales = "free")
+dnsityplTDemo.blkdF %>% print()
+
+dF$health<-as.factor(dF$health)
+
+dnsityplTDemo1<-dF %>% ggplot(data=dF,mapping=aes(x=c(wage),color=health,title=("Density plots of Wage Distributions, by Race and Education Level for Group Health Status "),sub=("with colored health status of each group; ISLR2")))+geom_density(alpha=0.45, aes(color=health,fill=health),size=c(0.5))+facet_grid(education~race,scales = "free")
+dnsityplTDemo1 %>% print()
+
+
+
+
+mdianwgeR<-summarise(dF,.by = c(race),mdianwge=median(wage)) %>% data.frame() %>% print()
+tapply(c(as.numeric(dF$wage)),c(factor(dF$race)),summary)
+mnsss<-tapply(c(dF$wage),factor(dF$race),mean)
+
+ggplot(data=dF,aes(x=c(wage), y= factor(race)))+geom_boxplot()
+
+
+ggplot(data=dF,aes(x= wage, y= race))+geom_boxplot(aes(color=race,fill=race))+ facet_grid(race~.,scales = "free")
+
+
+ggplot(data=dF,aes(x= wage, y= education,title=("Wage distributions by Education Level and Race;"),
+                   sub=("Dataset=ISLR2[Wage]Graph made in R by AAA")))+geom_boxplot(aes(color=race,fill=race))+facet_grid(race~.,scales = "free")
+
+
+
+hstyplTDemo.dF<-dF %>% ggplot(data=dF,mapping=aes(
+  x=c(wage)))+geom_histogram()+facet_grid(race~.,scales = "free")
+hstyplTDemo.dF %>% print()
+
+
+
+
+summarise(dF,.by = c(race),mdianwge=median(wage)) %>% data.frame() %>% print()
+
+
+
+
+dF["race"]
+
+is.na(dF)==T
+msng<-dF[is.na(dF)]
+summary(dF)
+summary(dF$age)
+dF
+```
